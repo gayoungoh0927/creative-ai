@@ -398,11 +398,6 @@ export default function UnifiedAIWorkspace() {
           {!sidebarCollapsed && '홈'}
         </button>
 
-        {/* 도구 섹션 */}
-        {!sidebarCollapsed && (
-          <p className="text-xs text-gray-500 uppercase tracking-wider mt-6 mb-2 px-5">도구</p>
-        )}
-        
         {Object.values(TOOLS).map((tool) => (
           <button
             key={tool.id}
@@ -989,17 +984,6 @@ export default function UnifiedAIWorkspace() {
                       </button>
                     </div>
 
-                    {/* 직접 입력 텍스트 영역 */}
-                    {workModes.includes('custom') && (
-                      <div className="mt-3">
-                        <textarea
-                          value={customPrompt}
-                          onChange={(e) => setCustomPrompt(e.target.value)}
-                          placeholder="원하는 작업 방식을 자유롭게 입력하세요. 예: 파란색 그라데이션 배경에 제품을 왼쪽에 배치해주세요"
-                          className="w-full px-3 py-2.5 border-2 border-violet-200 rounded-lg text-sm resize-none h-24 focus:outline-none focus:ring-2 focus:ring-violet-300 focus:border-violet-400 bg-white"
-                        />
-                      </div>
-                    )}
                   </div>
                 </>
               )}
@@ -1062,129 +1046,41 @@ export default function UnifiedAIWorkspace() {
             )}
           </aside>
 
-          {/* 메인 캔버스 - 기획서 생성 도구가 아닐 때만 표시 */}
+          {/* 중앙 영역 - 직접 입력 (기획서 생성 도구가 아닐 때만 표시) */}
           {currentTool !== 'planning' && (
           <main className="flex-1 flex flex-col overflow-hidden bg-gray-50">
-            {/* 뷰 탭 */}
-            {currentTool === 'banner' && variations.length > 0 && (
-              <div className="bg-white border-b border-gray-200 px-4 py-2 flex items-center shrink-0">
-                <div className="flex gap-1 bg-gray-100 p-1 rounded-lg">
-                  {[
-                    { id: 'pc', label: 'PC', icon: Monitor },
-                    { id: 'mobile', label: '모바일', icon: Smartphone },
-                  ].map((tab) => (
-                    <button
-                      key={tab.id}
-                      onClick={() => setViewMode(tab.id)}
-                      className={`flex items-center gap-2 px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${
-                        viewMode === tab.id ? 'bg-white text-violet-700 shadow-sm' : 'text-gray-500'
-                      }`}
-                    >
-                      <tab.icon size={14} />
-                      {tab.label}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {/* 캔버스 영역 */}
             <div className="flex-1 overflow-auto p-8 flex items-center justify-center">
-              {variations.length === 0 ? (
+              {currentTool === 'banner' && workModes.includes('custom') ? (
+                <div className="w-full max-w-2xl">
+                  <div className="bg-white rounded-2xl shadow-lg p-6">
+                    <h3 className="text-sm font-semibold text-gray-700 mb-3 flex items-center gap-2">
+                      <Sparkles size={14} className="text-violet-500" />
+                      직접 입력
+                    </h3>
+                    <textarea
+                      value={customPrompt}
+                      onChange={(e) => setCustomPrompt(e.target.value)}
+                      placeholder="원하는 작업 방식을 자유롭게 입력하세요. 예: 파란색 그라데이션 배경에 제품을 왼쪽에 배치해주세요"
+                      className="w-full px-4 py-4 border-2 border-violet-200 rounded-xl text-sm resize-none h-48 focus:outline-none focus:ring-2 focus:ring-violet-300 focus:border-violet-400 bg-white"
+                    />
+                    <p className="text-xs text-gray-400 mt-2">배경 스타일, 제품 위치, 색상 등을 자유롭게 설명해주세요</p>
+                  </div>
+                </div>
+              ) : (
                 <div className="text-center">
                   <div className={`w-24 h-24 bg-gradient-to-br ${tool.bgGradient} rounded-3xl flex items-center justify-center mx-auto mb-4 opacity-20`}>
                     <tool.icon size={40} className="text-white" />
                   </div>
                   <h3 className="text-lg font-semibold text-gray-700 mb-2">
-                    이미지를 업로드하세요
+                    {currentTool === 'banner' ? '직접 입력을 선택하세요' : '이미지를 업로드하세요'}
                   </h3>
                   <p className="text-sm text-gray-500 max-w-xs mx-auto">
-                    상품 이미지를 업로드하고 생성하기를 클릭하세요
+                    {currentTool === 'banner' ? '좌측에서 "직접 입력" 버튼을 클릭하면 프롬프트를 입력할 수 있습니다' : '상품 이미지를 업로드하고 생성하기를 클릭하세요'}
                   </p>
                 </div>
-              ) : (
-                <div className="w-full max-w-4xl">
-                  {currentTool === 'banner' && (
-                    <div className="flex flex-col items-center">
-                      {viewMode === 'pc' && (
-                        <div className="bg-white rounded-2xl shadow-xl overflow-hidden">
-                          <div 
-                            className="w-[640px] h-[160px] flex items-center justify-between px-16 relative"
-                            style={{ backgroundColor: '#c8c4bc' }}
-                          >
-                            {/* 텍스트 영역 */}
-                            <div className="text-gray-800 z-10">
-                              <h2 className={`text-2xl mb-1 ${textStyles.headline === 'bold' ? 'font-bold' : 'font-normal'}`}>국물·구이·볶음 외</h2>
-                              <h2 className={`text-2xl mb-2 ${textStyles.subheadline === 'bold' ? 'font-bold' : 'font-normal'}`}>따끈한 겨울 집밥 ~37%</h2>
-                              <p className="text-gray-600 text-sm">~12.01(월) 11시</p>
-                            </div>
-                            {/* 음식 이미지 영역 */}
-                            <div className="flex items-center relative">
-                              {/* 찌개 이미지 */}
-                              <div className="w-32 h-32 rounded-full bg-amber-600 flex items-center justify-center shadow-xl overflow-hidden relative z-10">
-                                <div className="w-28 h-28 rounded-full bg-orange-400 flex items-center justify-center">
-                                  <div className="text-center">
-                                    <div className="w-6 h-6 bg-yellow-200 rounded-full mx-auto mb-1"></div>
-                                    <div className="flex gap-1 justify-center">
-                                      <div className="w-3 h-3 bg-yellow-100 rounded-full"></div>
-                                      <div className="w-3 h-3 bg-yellow-100 rounded-full"></div>
-                                    </div>
-                                  </div>
-                                </div>
-                              </div>
-                              {/* 불고기 이미지 */}
-                              <div className="w-24 h-24 rounded-full bg-gray-100 flex items-center justify-center shadow-xl overflow-hidden -ml-4 -mt-16 relative z-20">
-                                <div className="w-20 h-20 rounded-full bg-stone-600 flex items-center justify-center">
-                                  <div className="w-12 h-8 bg-stone-500 rounded"></div>
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      )}
-                      {viewMode === 'mobile' && (
-                        <div className="bg-white rounded-2xl shadow-xl overflow-hidden">
-                          <div 
-                            className="w-[200px] h-[300px] p-4 flex flex-col items-center justify-center text-center"
-                            style={{ backgroundColor: '#c8c4bc' }}
-                          >
-                            <div className="flex items-center mb-4 relative">
-                              <div className="w-20 h-20 rounded-full bg-amber-600 flex items-center justify-center shadow-xl overflow-hidden z-10">
-                                <div className="w-16 h-16 rounded-full bg-orange-400"></div>
-                              </div>
-                              <div className="w-14 h-14 rounded-full bg-gray-100 flex items-center justify-center shadow-xl -ml-3 -mt-8 z-20">
-                                <div className="w-10 h-10 rounded-full bg-stone-600"></div>
-                              </div>
-                            </div>
-                            <h2 className={`text-sm text-gray-800 mb-1 ${textStyles.headline === 'bold' ? 'font-bold' : 'font-normal'}`}>국물·구이·볶음 외</h2>
-                            <h2 className={`text-base text-gray-800 mb-1 ${textStyles.subheadline === 'bold' ? 'font-bold' : 'font-normal'}`}>따끈한 겨울 집밥</h2>
-                            <p className="text-gray-800 text-lg font-bold mb-2">~37%</p>
-                            <p className="text-gray-600 text-xs">~12.01(월) 11시</p>
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                  )}
-                  
-                  {currentTool === 'shooting' && (
-                    <div className="bg-white rounded-2xl shadow-xl overflow-hidden max-w-lg mx-auto">
-                      <div className={`aspect-square bg-gradient-to-br ${tool.bgGradient} p-8 flex items-center justify-center`}>
-                        <div className="w-48 h-48 bg-white/20 rounded-2xl flex items-center justify-center backdrop-blur-sm">
-                          <Camera size={48} className="text-white/60" />
-                        </div>
-                      </div>
-                      <div className="px-4 py-3 bg-gray-50 text-xs text-gray-400 flex justify-between items-center">
-                        <span>상품 촬영컷</span>
-                        <span>2048 × 2048</span>
-                      </div>
-                    </div>
-                  )}
-
-                  </div>
               )}
             </div>
-
-            </main>
+          </main>
           )}
 
           {/* 우측 패널 */}
@@ -1297,77 +1193,179 @@ export default function UnifiedAIWorkspace() {
               </div>
             </aside>
           ) : (
-            /* 기본 - AI 변형 패널 */
-            <aside className="w-72 bg-white border-l border-gray-200 flex flex-col overflow-hidden shrink-0">
-            <div className="p-4 border-b border-gray-100">
-              <h3 className="text-sm font-semibold text-gray-700 flex items-center gap-2">
-                <Sparkles size={14} className={`text-${tool.color}-500`} />
-                AI 변형
-              </h3>
-            </div>
-            
-            <div className="flex-1 overflow-y-auto p-4">
-              {variations.length === 0 ? (
-                <div className="text-center py-8 text-gray-400">
-                  <Layers size={32} className="mx-auto mb-3 text-gray-300" />
-                  <p className="text-sm">생성하면 변형이 표시됩니다</p>
-                </div>
-              ) : (
-                <div className="space-y-3">
-                  {variations.map((v, idx) => (
-                    <div
-                      key={v.id}
-                      onClick={() => setSelectedVariation(idx)}
-                      className={`rounded-xl cursor-pointer transition-all overflow-hidden ${
-                        selectedVariation === idx 
-                          ? 'ring-2 ring-violet-500' 
-                          : 'hover:opacity-80'
-                      }`}
-                    >
-                      <div 
-                        className="h-14 px-3 flex items-center justify-between"
-                        style={{ backgroundColor: '#c8c4bc' }}
-                      >
-                        <div className="text-gray-800">
-                          <p className="text-xs font-bold">따끈한 겨울 집밥</p>
-                          <p className="text-xs">~37%</p>
-                        </div>
-                        <div className="flex items-center">
-                          <div className="w-8 h-8 rounded-full bg-amber-600 shadow-md z-10"></div>
-                          <div className="w-6 h-6 rounded-full bg-gray-100 shadow-md -ml-2 z-20"></div>
-                        </div>
+            /* 기본 - 결과물 + AI 변형 + 편집 기록 패널 */
+            <aside className="w-96 bg-white border-l border-gray-200 flex flex-col overflow-hidden shrink-0">
+              <div className="flex-1 overflow-y-auto">
+                {/* 결과물 미리보기 */}
+                <div className="p-4 border-b border-gray-100">
+                  <h3 className="text-sm font-semibold text-gray-700 mb-3 flex items-center gap-2">
+                    <Layers size={14} className={`text-${tool.color}-500`} />
+                    결과물
+                  </h3>
+                  {variations.length === 0 ? (
+                    <div className="text-center py-8 text-gray-400 bg-gray-50 rounded-xl">
+                      <div className={`w-16 h-16 bg-gradient-to-br ${tool.bgGradient} rounded-2xl flex items-center justify-center mx-auto mb-3 opacity-20`}>
+                        <tool.icon size={28} className="text-white" />
                       </div>
+                      <p className="text-sm">생성된 결과물이 여기에 표시됩니다</p>
                     </div>
-                  ))}
-                </div>
-              )}
-            </div>
+                  ) : (
+                    <div className="space-y-3">
+                      {/* 뷰 모드 탭 */}
+                      {currentTool === 'banner' && (
+                        <div className="flex gap-1 bg-gray-100 p-1 rounded-lg mb-3">
+                          {[
+                            { id: 'pc', label: 'PC', icon: Monitor },
+                            { id: 'mobile', label: '모바일', icon: Smartphone },
+                          ].map((tab) => (
+                            <button
+                              key={tab.id}
+                              onClick={() => setViewMode(tab.id)}
+                              className={`flex-1 flex items-center justify-center gap-2 px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${
+                                viewMode === tab.id ? 'bg-white text-violet-700 shadow-sm' : 'text-gray-500'
+                              }`}
+                            >
+                              <tab.icon size={14} />
+                              {tab.label}
+                            </button>
+                          ))}
+                        </div>
+                      )}
 
-            {/* 히스토리 */}
-            <div className="p-4 border-t border-gray-100">
-              <h3 className="text-sm font-semibold text-gray-700 mb-3 flex items-center gap-2">
-                <Clock size={14} />
-                편집 기록
-              </h3>
-              <div className="space-y-2 max-h-48 overflow-y-auto">
-                {editHistory.length === 0 ? (
-                  <p className="text-xs text-gray-400 text-center py-2">기록이 없습니다</p>
-                ) : (
-                  editHistory.slice().reverse().map((h, i) => (
-                    <div key={i} className="text-xs p-2.5 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
-                      <div className="flex items-center justify-between mb-1">
-                        <span className="text-gray-400">{h.date} {h.time}</span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <Sparkles size={10} className="text-violet-500 shrink-0" />
-                        <span className="text-gray-700 font-medium">{h.message}</span>
-                      </div>
+                      {/* 배너 미리보기 */}
+                      {currentTool === 'banner' && (
+                        <>
+                          {viewMode === 'pc' && (
+                            <div className="bg-white rounded-xl shadow-md overflow-hidden">
+                              <div
+                                className="w-full h-[100px] flex items-center justify-between px-6 relative"
+                                style={{ backgroundColor: '#c8c4bc' }}
+                              >
+                                <div className="text-gray-800 z-10">
+                                  <h2 className={`text-base mb-0.5 ${textStyles.headline === 'bold' ? 'font-bold' : 'font-normal'}`}>국물·구이·볶음 외</h2>
+                                  <h2 className={`text-base mb-1 ${textStyles.subheadline === 'bold' ? 'font-bold' : 'font-normal'}`}>따끈한 겨울 집밥 ~37%</h2>
+                                  <p className="text-gray-600 text-xs">~12.01(월) 11시</p>
+                                </div>
+                                <div className="flex items-center relative">
+                                  <div className="w-20 h-20 rounded-full bg-amber-600 flex items-center justify-center shadow-xl overflow-hidden relative z-10">
+                                    <div className="w-16 h-16 rounded-full bg-orange-400"></div>
+                                  </div>
+                                  <div className="w-14 h-14 rounded-full bg-gray-100 flex items-center justify-center shadow-xl overflow-hidden -ml-3 -mt-10 relative z-20">
+                                    <div className="w-10 h-10 rounded-full bg-stone-600"></div>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          )}
+                          {viewMode === 'mobile' && (
+                            <div className="bg-white rounded-xl shadow-md overflow-hidden mx-auto" style={{ width: '140px' }}>
+                              <div
+                                className="w-full h-[200px] p-3 flex flex-col items-center justify-center text-center"
+                                style={{ backgroundColor: '#c8c4bc' }}
+                              >
+                                <div className="flex items-center mb-3 relative">
+                                  <div className="w-14 h-14 rounded-full bg-amber-600 flex items-center justify-center shadow-xl overflow-hidden z-10">
+                                    <div className="w-10 h-10 rounded-full bg-orange-400"></div>
+                                  </div>
+                                  <div className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center shadow-xl -ml-2 -mt-6 z-20">
+                                    <div className="w-7 h-7 rounded-full bg-stone-600"></div>
+                                  </div>
+                                </div>
+                                <h2 className={`text-xs text-gray-800 mb-0.5 ${textStyles.headline === 'bold' ? 'font-bold' : 'font-normal'}`}>국물·구이·볶음 외</h2>
+                                <h2 className={`text-sm text-gray-800 mb-0.5 ${textStyles.subheadline === 'bold' ? 'font-bold' : 'font-normal'}`}>따끈한 겨울 집밥</h2>
+                                <p className="text-gray-800 text-sm font-bold mb-1">~37%</p>
+                                <p className="text-gray-600 text-xs">~12.01(월) 11시</p>
+                              </div>
+                            </div>
+                          )}
+                        </>
+                      )}
+
+                      {/* 촬영컷 미리보기 */}
+                      {currentTool === 'shooting' && (
+                        <div className="bg-white rounded-xl shadow-md overflow-hidden">
+                          <div className={`aspect-square bg-gradient-to-br ${tool.bgGradient} p-4 flex items-center justify-center`}>
+                            <div className="w-24 h-24 bg-white/20 rounded-xl flex items-center justify-center backdrop-blur-sm">
+                              <Camera size={32} className="text-white/60" />
+                            </div>
+                          </div>
+                          <div className="px-3 py-2 bg-gray-50 text-xs text-gray-400 flex justify-between items-center">
+                            <span>상품 촬영컷</span>
+                            <span>2048 × 2048</span>
+                          </div>
+                        </div>
+                      )}
                     </div>
-                  ))
-                )}
+                  )}
+                </div>
+
+                {/* AI 변형 */}
+                <div className="p-4 border-b border-gray-100">
+                  <h3 className="text-sm font-semibold text-gray-700 mb-3 flex items-center gap-2">
+                    <Sparkles size={14} className={`text-${tool.color}-500`} />
+                    AI 변형
+                  </h3>
+                  {variations.length === 0 ? (
+                    <div className="text-center py-4 text-gray-400">
+                      <p className="text-sm">생성하면 변형이 표시됩니다</p>
+                    </div>
+                  ) : (
+                    <div className="space-y-2">
+                      {variations.map((v, idx) => (
+                        <div
+                          key={v.id}
+                          onClick={() => setSelectedVariation(idx)}
+                          className={`rounded-lg cursor-pointer transition-all overflow-hidden ${
+                            selectedVariation === idx
+                              ? 'ring-2 ring-violet-500'
+                              : 'hover:opacity-80'
+                          }`}
+                        >
+                          <div
+                            className="h-12 px-3 flex items-center justify-between"
+                            style={{ backgroundColor: '#c8c4bc' }}
+                          >
+                            <div className="text-gray-800">
+                              <p className="text-xs font-bold">따끈한 겨울 집밥</p>
+                              <p className="text-xs">~37%</p>
+                            </div>
+                            <div className="flex items-center">
+                              <div className="w-6 h-6 rounded-full bg-amber-600 shadow-md z-10"></div>
+                              <div className="w-5 h-5 rounded-full bg-gray-100 shadow-md -ml-1.5 z-20"></div>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+
+                {/* 편집 기록 */}
+                <div className="p-4">
+                  <h3 className="text-sm font-semibold text-gray-700 mb-3 flex items-center gap-2">
+                    <Clock size={14} />
+                    편집 기록
+                  </h3>
+                  <div className="space-y-2 max-h-32 overflow-y-auto">
+                    {editHistory.length === 0 ? (
+                      <p className="text-xs text-gray-400 text-center py-2">기록이 없습니다</p>
+                    ) : (
+                      editHistory.slice().reverse().map((h, i) => (
+                        <div key={i} className="text-xs p-2.5 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+                          <div className="flex items-center justify-between mb-1">
+                            <span className="text-gray-400">{h.date} {h.time}</span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <Sparkles size={10} className="text-violet-500 shrink-0" />
+                            <span className="text-gray-700 font-medium">{h.message}</span>
+                          </div>
+                        </div>
+                      ))
+                    )}
+                  </div>
+                </div>
               </div>
-            </div>
-          </aside>
+            </aside>
           )}
         </div>
       </div>
